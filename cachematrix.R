@@ -4,7 +4,17 @@
 ## that can cache its inverse.
 
 makeCacheMatrix <- function(x = matrix()) {
-    m <<- NULL
+    m <- NULL
+    set <- function(y) {
+        x <<- y
+        m <<- NULL
+    }
+    get <- function() x
+    setMatrix <- function(solve) m <<- solve
+    getMatrix <- function() m
+    list(set = set, get = get,
+         setMatrix = setMatrix,
+         getMatrix = getMatrix)
 }
 
 
@@ -15,13 +25,15 @@ makeCacheMatrix <- function(x = matrix()) {
 
 cacheSolve <- function(x, ...) {
     ## Return a matrix that is the inverse of 'x'
-    makeCacheMatrix(x)
-    
-    if (dim(x)[1] == dim(x)[2]) {
-        #print("this matrix is square, invertible")
-        
-        m <- solve(x)
-        #print("ans")
-        #print(m)
+
+    m <- x$getMatrix()
+    if(!is.null(m)) {
+        message("getting cached data")
+        return(m)
     }
+    data <- x$get()
+    m <- solve(data, ...)
+    x$setMatrix(m)
+    m
+    
 }
